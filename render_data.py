@@ -92,11 +92,6 @@ def get_output(args):
     else:
         print(sum_df['count'])
 
-#get_output(None, {'avgtime':None})
-#get_output(None, {'failed':None, 'avgtime':None})
-#get_output(None, {'app':'app2', 'summary':None})
-#get_output(None, {'renderer':'Xiao Lee', })
-
 parser = argparse.ArgumentParser()
 parser.add_argument('path', nargs='?', default=getcwd())
 parser.add_argument('-failed', action='store_true')
@@ -111,11 +106,11 @@ group.add_argument('-maxcpu', action='store_true')
 group.add_argument('-summary', action='store_true')
 args = parser.parse_args()
 
-print(args.path)
-print(args.failed)
-print(args.app)
-print(args.renderer)
-print(args.avgtime)
-print(args.summary)
+# print(args.path)
+# print(args.failed)
+# print(args.app)
+# print(args.renderer)
+# print(args.avgtime)
+# print(args.summary)
 
 get_output(args)
