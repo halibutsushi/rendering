@@ -13,11 +13,9 @@ def get_output(path, options):
     redering_file_pattern = r'renders_[0-9]{4}-[0-1][0-9]-[0-3][0-9]\.csv'
     file_names = [f for f in listdir(path) if isfile(join(path, f)) and re.match(redering_file_pattern, f)]
 
-    print(file_names)
     files = []
     for f in file_names:
         try:
-            print(f[8:-4])
             datetime.strptime(f[8:-4], '%Y-%m-%d')
         except Exception:
             continue
@@ -30,8 +28,18 @@ def get_output(path, options):
 
         if 'failed' not in options:
             df = df[df['status'] == True]
-        print(df.head())
+
+        if 'app' in options:
+            df = df[df['app'] == options['app']]
+
+        if 'renderer' in options:
+            df = df[df['renderer'] == options['renderer']]
+
+        print(df)
         break
 
 
 get_output(None, {})
+get_output(None, {'failed':None, })
+get_output(None, {'app':'app2', })
+get_output(None, {'renderer':'Xiao Lee', })
