@@ -1,15 +1,14 @@
+import argparse
 import re
 from datetime import datetime
-from os import listdir
+from os import listdir, getcwd
 from os.path import isfile, join
 
 import pandas as pd
 
 
-def get_output(path, options):
-    if path is None:
-        path = './'
-
+def get_output(args):
+    path = args.path
     redering_file_pattern = r'renders_[0-9]{4}-[0-1][0-9]-[0-3][0-9]\.csv'
     file_names = [f for f in listdir(path) if isfile(join(path, f)) and re.match(redering_file_pattern, f)]
 
@@ -27,12 +26,12 @@ def get_output(path, options):
     sum_df = None
 
     get_sum = True
-    if 'summary' in options:
+    if args.summary:
         get_max_ram = True
         get_max_cpu = True
     else:
-        get_max_ram = 'maxram' in options
-        get_max_cpu = 'maxcpu' in options
+        get_max_ram = args.maxram
+        get_max_cpu = args.maxcpu
         if get_max_ram or get_max_cpu:
             get_sum = False
 
@@ -40,14 +39,14 @@ def get_output(path, options):
         df = pd.read_csv(f, header=None,
                          names=['id', 'app', 'renderer', 'frames', 'status', 'render_time', 'ram_usage', 'cpu_ptg'])
 
-        if 'failed' not in options:
+        if args.failed is False:
             df = df[df['status'] == True]
 
-        if 'app' in options:
-            df = df[df['app'] == options['app']]
+        if args.app:
+            df = df[df['app'] == args.app]
 
-        if 'renderer' in options:
-            df = df[df['renderer'] == options['renderer']]
+        if args.renderer:
+            df = df[df['renderer'] == args.renderer]
 
         df.fillna(0, inplace=True)
 
@@ -84,16 +83,39 @@ def get_output(path, options):
         print(max_cpu)
     elif get_max_ram:
         print(max_ram)
-    elif 'avgtime' in options:
+    elif args.avgtime:
         print(avg_df['render_time'])
-    elif 'avgcpu' in options:
+    elif args.avgcpu:
         print(avg_df['cpu_ptg'])
-    elif 'avgram' in options:
+    elif args.avgram:
         print(avg_df['ram_usage'])
     else:
         print(sum_df['count'])
 
-get_output(None, {'avgtime':None})
+#get_output(None, {'avgtime':None})
 #get_output(None, {'failed':None, 'avgtime':None})
 #get_output(None, {'app':'app2', 'summary':None})
 #get_output(None, {'renderer':'Xiao Lee', })
+
+parser = argparse.ArgumentParser()
+parser.add_argument('path', nargs='?', default=getcwd())
+parser.add_argument('-failed', action='store_true')
+parser.add_argument('-app', type=str)
+parser.add_argument('-renderer', type=str)
+group = parser.add_mutually_exclusive_group()
+group.add_argument('-avgtime', action='store_true')
+group.add_argument('-avgcpu', action='store_true')
+group.add_argument('-avgram', action='store_true')
+group.add_argument('-maxram', action='store_true')
+group.add_argument('-maxcpu', action='store_true')
+group.add_argument('-summary', action='store_true')
+args = parser.parse_args()
+
+print(args.path)
+print(args.failed)
+print(args.app)
+print(args.renderer)
+print(args.avgtime)
+print(args.summary)
+
+get_output(args)
