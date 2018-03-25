@@ -3,8 +3,10 @@ from datetime import datetime
 from os import listdir
 from os.path import isfile, join
 
+import pandas as pd
 
-def get_output(path, option):
+
+def get_output(path, options):
     if path is None:
         path = './'
 
@@ -22,7 +24,14 @@ def get_output(path, option):
 
         files.append(join(path, f))
 
-    print(files)
+    for f in files:
+        df = pd.read_csv(f, header=None,
+                         names=['id', 'app', 'renderer', 'frames', 'status', 'render_time', 'ram_usage', 'cpu_ptg'])
+
+        if 'failed' not in options:
+            df = df[df['status'] == True]
+        print(df.head())
+        break
 
 
-get_output(None, None)
+get_output(None, {})
