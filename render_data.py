@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import argparse
 import re
 from datetime import datetime
@@ -9,6 +11,7 @@ import pandas as pd
 
 def get_output(args):
     path = args.path
+    # regular expression for rendering files
     redering_file_pattern = r'renders_[0-9]{4}-[0-1][0-9]-[0-3][0-9]\.csv'
     file_names = [f for f in listdir(path) if isfile(join(path, f)) and re.match(redering_file_pattern, f)]
 
@@ -26,12 +29,14 @@ def get_output(args):
     sum_df = None
 
     get_sum = True
+    # if there is -summary flag, calculate all max values and sum values
     if args.summary:
         get_max_ram = True
         get_max_cpu = True
     else:
         get_max_ram = args.maxram
         get_max_cpu = args.maxcpu
+        # if there is no -summary flag and there is either one of max value flags do not calculate sum values
         if get_max_ram or get_max_cpu:
             get_sum = False
 
@@ -39,6 +44,8 @@ def get_output(args):
         df = pd.read_csv(f, header=None,
                          names=['id', 'app', 'renderer', 'frames', 'status', 'render_time', 'ram_usage', 'cpu_ptg'])
 
+
+        # filter rows according to the filtering flags
         if args.failed is False:
             df = df[df['status'] == True]
 
@@ -48,8 +55,12 @@ def get_output(args):
         if args.renderer:
             df = df[df['renderer'] == args.renderer]
 
+        # filtering finished
+
+        # set null values to zeros
         df.fillna(0, inplace=True)
 
+        # calculate sum values, if any of average value calculation is needed
         if get_sum:
             df['count'] = 1
             new_sum = df.agg({'render_time':'sum', 'ram_usage':'sum', 'cpu_ptg':'sum', 'count':'sum'})
@@ -58,6 +69,7 @@ def get_output(args):
             else:
                 sum_df += new_sum
 
+        # update max values
         if get_max_ram:
             new_ram = df['ram_usage'].max()
             if new_ram > max_ram:
@@ -67,12 +79,14 @@ def get_output(args):
             if new_cpu > max_cpu:
                 max_cpu = new_cpu
 
+    # calculate average values
     if sum_df is not None:
         if sum_df['count'] > 0:
             avg_df = sum_df / sum_df['count']
         else:
             avg_df = sum_df
 
+    # print outputs
     if get_sum and get_max_cpu:
         print(avg_df['render_time'])
         print(avg_df['cpu_ptg'])
@@ -97,6 +111,8 @@ parser.add_argument('path', nargs='?', default=getcwd())
 parser.add_argument('-failed', action='store_true')
 parser.add_argument('-app', type=str)
 parser.add_argument('-renderer', type=str)
+
+# mutually exclusive flag group
 group = parser.add_mutually_exclusive_group()
 group.add_argument('-avgtime', action='store_true')
 group.add_argument('-avgcpu', action='store_true')
