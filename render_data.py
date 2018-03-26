@@ -40,6 +40,7 @@ def get_output(args):
         if get_max_ram or get_max_cpu:
             get_sum = False
 
+    # for each files calculate sum values and max values according to the input flags
     for f in files:
         df = pd.read_csv(f, header=None,
                          names=['id', 'app', 'renderer', 'frames', 'status', 'render_time', 'ram_usage', 'cpu_ptg'])
