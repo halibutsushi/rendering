@@ -83,10 +83,15 @@ def get_output(args):
 
     # calculate average values
     if sum_df is not None:
-        if sum_df['count'] > 0:
+        count = sum_df['count']
+        if count > 0:
             avg_df = sum_df / sum_df['count']
         else:
             avg_df = sum_df
+
+    else:
+        count = 0
+        avg_df = {'render_time': 0, 'cpu_ptg':0, 'ram_usage': 0}
 
     # print outputs
     if get_sum and get_max_cpu:
