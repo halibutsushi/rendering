@@ -113,7 +113,7 @@ def get_output(args):
     elif args.avgram:
         print(avg_df['ram_usage'])
     else:
-        print(sum_df['count'])
+        print(count)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('path', nargs='?', default=getcwd())
