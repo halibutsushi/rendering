@@ -45,6 +45,8 @@ def get_output(args):
         df = pd.read_csv(f, header=None,
                          names=['id', 'app', 'renderer', 'frames', 'status', 'render_time', 'ram_usage', 'cpu_ptg'])
 
+        if len(df) == 0:
+            continue
 
         # filter rows according to the filtering flags
         if args.failed is False or args.maxram or args.maxcpu or args.summary or args.avgcpu or args.avgram \
