@@ -47,7 +47,8 @@ def get_output(args):
 
 
         # filter rows according to the filtering flags
-        if args.failed is False:
+        if args.failed is False or args.maxram or args.maxcpu or args.summary or args.avgcpu or args.avgram \
+                or args.avgtime:
             df = df[df['status'] == True]
 
         if args.app:
